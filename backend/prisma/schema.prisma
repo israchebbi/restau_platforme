@@ -1,0 +1,155 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SUPER_ADMIN
+  RESTAURANT
+  CLIENT
+  DRIVER
+}
+
+enum RestaurantStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PREPARING
+  READY
+  ACCEPTED
+  PICKED_UP
+  DELIVERING
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentMode {
+  ONLINE
+  CASH
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+}
+
+model User {
+  id           Int         @id @default(autoincrement())
+  name         String
+  email        String      @unique
+  phone        String
+  passwordHash String
+  role         Role
+  createdAt    DateTime    @default(now())
+  restaurant   Restaurant?
+  driver       Driver?
+  orders       Order[]
+}
+
+model Restaurant {
+  id             Int              @id @default(autoincrement())
+  name           String
+  logo           String?
+  address        String
+  latitude       Float
+  longitude      Float
+  cuisine        String
+  openingHours   String?
+  status         RestaurantStatus @default(PENDING)
+  commissionRate Float            @default(0.10)
+  owner          User             @relation(fields: [ownerId], references: [id])
+  ownerId        Int              @unique
+  categories     Category[]
+  orders         Order[]
+}
+
+model Driver {
+  id        Int     @id @default(autoincrement())
+  user      User    @relation(fields: [userId], references: [id])
+  userId    Int     @unique
+  available Boolean @default(false)
+  vehicle   String?
+  latitude  Float?
+  longitude Float?
+  orders    Order[]
+}
+
+model Category {
+  id           Int        @id @default(autoincrement())
+  name         String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurantId Int
+  dishes       Dish[]
+}
+
+model Dish {
+  id          Int         @id @default(autoincrement())
+  name        String
+  description String?
+  price       Float
+  image       String?
+  available   Boolean     @default(true)
+  category    Category    @relation(fields: [categoryId], references: [id])
+  categoryId  Int
+  items       OrderItem[]
+}
+
+model Order {
+  id           Int         @id @default(autoincrement())
+  status       OrderStatus @default(PENDING)
+  paymentMode  PaymentMode
+  total        Float
+  deliveryFee  Float
+  address      String
+  latitude     Float
+  longitude    Float
+  phone        String
+  createdAt    DateTime    @default(now())
+  client       User        @relation(fields: [clientId], references: [id])
+  clientId     Int
+  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id])
+  restaurantId Int
+  driver       Driver?     @relation(fields: [driverId], references: [id])
+  driverId     Int?
+  items        OrderItem[]
+  payment      Payment?
+  review       Review?
+}
+
+model OrderItem {
+  id       Int   @id @default(autoincrement())
+  quantity Int
+  price    Float
+  order    Order @relation(fields: [orderId], references: [id])
+  orderId  Int
+  dish     Dish  @relation(fields: [dishId], references: [id])
+  dishId   Int
+}
+
+model Payment {
+  id         Int           @id @default(autoincrement())
+  amount     Float
+  status     PaymentStatus @default(PENDING)
+  commission Float         @default(0)
+  order      Order         @relation(fields: [orderId], references: [id])
+  orderId    Int           @unique
+}
+
+model Review {
+  id               Int     @id @default(autoincrement())
+  restaurantRating Int
+  driverRating     Int?
+  comment          String?
+  order            Order   @relation(fields: [orderId], references: [id])
+  orderId          Int     @unique
+}
