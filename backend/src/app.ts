@@ -3,6 +3,8 @@ import cors from "cors";
 import helmet from "helmet";
 import authRoutes from "./modules/auth/auth.routes";
 import { errorHandler } from "./middlewares/error";
+import restaurantsRoutes from "./modules/restaurants/restaurants.routes";
+import menuRoutes from "./modules/menu/menu.routes";
 
 const app = express();
 
@@ -19,6 +21,8 @@ app.get("/health", (_req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/restaurants", restaurantsRoutes);
+app.use("/api/menu" , menuRoutes);
 
 app.use(errorHandler);
 
