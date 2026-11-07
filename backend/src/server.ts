@@ -1,8 +1,13 @@
 import "dotenv/config";
+import http from "http";
 import app from "./app";
+import { initSocket } from "./sockets";
 
 const PORT = process.env.PORT || 4000;
 
-app.listen(PORT, () => {
+const server = http.createServer(app);
+initSocket(server);
+
+server.listen(PORT, () => {
   console.log(`API running on http://localhost:${PORT}`);
 });

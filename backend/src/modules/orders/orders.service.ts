@@ -1,6 +1,7 @@
 import { OrderStatus, Role } from "@prisma/client";
 import { prisma } from "../../config/prisma";
 import { HttpError } from "../../utils/httpError";
+import {emit } from "../../sockets/io";
 
 const DELIVERY_FEE = 3;
 
@@ -81,7 +82,7 @@ export async function createOrder(
   const total = round2(subtotal + DELIVERY_FEE);
   const commission = round2(subtotal * restaurant.commissionRate);
 
-  return prisma.order.create({
+  const order = await prisma.order.create({
     data: {
       paymentMode: data.paymentMode,
       total,
@@ -103,6 +104,8 @@ export async function createOrder(
     },
     include: orderDetails,
   });
+  emit(`restaurant:${restaurant.id}`, "order:new", order);
+  return order;
 }
 
 export function listMyOrders(clientId: number) {
@@ -121,10 +124,12 @@ export async function cancelOrder(clientId: number, orderId: number) {
   if (order.status !== "PENDING" && order.status !== "CONFIRMED") {
     throw new HttpError(400, "This order can no longer be cancelled");
   }
-  return prisma.order.update({
+    const updated = await prisma.order.update({
     where: { id: orderId },
     data: { status: "CANCELLED" },
   });
+  emit(`restaurant:${updated.restaurantId}`, "order:cancelled", { orderId });
+  return updated;
 }
 
 // ---------- Restaurant ----------
@@ -156,8 +161,13 @@ export async function updateRestaurantStatus(
   if (!allowed.includes(status)) {
     throw new HttpError(400, `Cannot change status from ${order.status} to ${status}`);
   }
-  return prisma.order.update({ where: { id: orderId }, data: { status } });
-}
+  const updated = await prisma.order.update({
+    where: { id: orderId },
+    data: { status },
+  });
+  emit(`user:${updated.clientId}`, "order:status", { orderId, status });
+  if (status === "READY") emit("drivers", "order:available", { orderId });
+  return updated;}
 
 // ---------- Driver ----------
 export function listAvailableOrders() {
@@ -192,7 +202,7 @@ export async function acceptOrder(userId: number, orderId: number) {
     throw new HttpError(409, "This order is no longer available");
   }
 
-  return prisma.order.findUnique({
+    const order = await prisma.order.findUnique({
     where: { id: orderId },
     include: {
       items: { include: { dish: { select: { name: true } } } },
@@ -202,6 +212,13 @@ export async function acceptOrder(userId: number, orderId: number) {
       client: { select: { name: true, phone: true } },
     },
   });
+
+  emit("drivers", "order:taken", { orderId });
+  if (order) {
+    emit(`user:${order.clientId}`, "order:status", { orderId, status: "ACCEPTED" });
+    emit(`restaurant:${order.restaurantId}`, "order:status", { orderId, status: "ACCEPTED" });
+  }
+  return order;
 }
 
 export async function updateDeliveryStatus(
@@ -220,7 +237,7 @@ export async function updateDeliveryStatus(
     throw new HttpError(400, `Cannot change status from ${order.status} to ${status}`);
   }
 
-  return prisma.$transaction(async (tx) => {
+  const updated = await prisma.$transaction(async (tx) => {
     const updated = await tx.order.update({
       where: { id: orderId },
       data: { status },
@@ -233,6 +250,9 @@ export async function updateDeliveryStatus(
     }
     return updated;
   });
+    emit(`user:${updated.clientId}`, "order:status", { orderId, status });
+  emit(`restaurant:${updated.restaurantId}`, "order:status", { orderId, status });
+  return updated;
 }
 
 export async function listDriverOrders(userId: number) {
