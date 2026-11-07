@@ -44,7 +44,7 @@ export async function login(email: string, password: string) {
 
   const ok = await bcrypt.compare(password, user.passwordHash);
   if (!ok) throw new HttpError(401, "Invalid email or password");
-
+  if (user.isBlocked) throw new HttpError(403, "Account blocked");
   return { user: sanitize(user), token: createToken(user) };
 }
 
