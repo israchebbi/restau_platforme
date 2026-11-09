@@ -39,3 +39,18 @@ export interface Order {
   client: { name: string };
   driver: { user: { name: string; phone: string } } | null;
 }
+export interface Dish {
+  id: number;
+  name: string;
+  description: string | null;
+  price: number;
+  image: string | null;
+  available: boolean;
+  categoryId: number;
+}
+
+export interface Category {
+  id: number;
+  name: string;
+  dishes: Dish[];
+}
