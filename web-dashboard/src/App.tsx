@@ -5,6 +5,7 @@ import ProtectedRoute from "./auth/protectionRoute";
 import DashboardLayout from "./layouts/dashboardLayout";
 import Login from "./pages/login";
 import Placeholder from "./pages/placeholder";
+import Orders from "./pages/restaurant/orders";
 
 export default function App() {
   const { user } = useAuth();
@@ -15,7 +16,7 @@ export default function App() {
 
       <Route element={<ProtectedRoute roles={["RESTAURANT"]} />}>
         <Route element={<DashboardLayout />}>
-          <Route path="/restaurant/orders" element={<Placeholder title="Orders" />} />
+          <Route path="/restaurant/orders" element={<Orders />} />
           <Route path="/restaurant/menu" element={<Placeholder title="Menu" />} />
           <Route path="/restaurant/stats" element={<Placeholder title="Statistics" />} />
         </Route>
