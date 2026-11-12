@@ -54,3 +54,26 @@ export interface Category {
   name: string;
   dishes: Dish[];
 }
+export interface StatsOverview {
+  totalOrders: number;
+  ordersByStatus: Partial<Record<OrderStatus, number>>;
+  deliveredOrders: number;
+  sales: number;
+  deliveryFees: number;
+  platformCommission: number;
+  restaurantNet: number;
+  averageOrderValue: number;
+}
+
+export interface DailyStat {
+  date: string;
+  orders: number;
+  sales: number;
+}
+
+export interface TopDish {
+  dishId: number;
+  name: string;
+  restaurant?: string;
+  quantity: number;
+}

@@ -7,6 +7,8 @@ import Login from "./pages/login";
 import Placeholder from "./pages/placeholder";
 import Orders from "./pages/restaurant/orders";
 import Menu from "./pages/restaurant/menu";
+import stats from "./pages/restaurant/stats";
+import Stats from "./pages/restaurant/stats";
 
 export default function App() {
   const { user } = useAuth();
@@ -19,7 +21,7 @@ export default function App() {
         <Route element={<DashboardLayout />}>
           <Route path="/restaurant/orders" element={<Orders />} />
           <Route path="/restaurant/menu" element={<Menu />} />
-          <Route path="/restaurant/stats" element={<Placeholder title="Statistics" />} />
+          <Route path="/restaurant/stats" element={<Stats />} />
         </Route>
       </Route>
 
