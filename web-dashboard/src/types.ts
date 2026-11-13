@@ -92,3 +92,26 @@ export interface AdminRestaurant {
   commissionRate: number;
   owner: { id: number; name: string; email: string };
 }
+export interface DriverRow {
+  id: number;
+  userId: number;
+  available: boolean;
+  vehicle: string | null;
+  user: {
+    id: number;
+    name: string;
+    email: string;
+    phone: string;
+    isBlocked: boolean;
+  };
+}
+
+export interface ClientRow {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  isBlocked: boolean;
+  createdAt: string;
+  _count: { orders: number };
+}

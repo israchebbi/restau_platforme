@@ -9,6 +9,8 @@ import Orders from "./pages/restaurant/orders";
 import Menu from "./pages/restaurant/menu";
 import Stats from "./pages/restaurant/stats";
 import Restaurants from "./pages/admin/Restaurants";
+import Clients from "./pages/admin/Clients";
+import Drivers from "./pages/admin/Drivers";
 export default function App() {
   const { user } = useAuth();
 
@@ -28,8 +30,8 @@ export default function App() {
         <Route element={<DashboardLayout />}>
           <Route path="/admin/overview" element={<Placeholder title="Overview" />} />
           <Route path="/admin/restaurants" element={<Restaurants />} />
-          <Route path="/admin/drivers" element={<Placeholder title="Drivers" />} />
-          <Route path="/admin/clients" element={<Placeholder title="Clients" />} />
+          <Route path="/admin/drivers" element={<Drivers />} />
+          <Route path="/admin/clients" element={<Clients />} />
           <Route path="/admin/orders" element={<Placeholder title="All orders" />} />
         </Route>
       </Route>
