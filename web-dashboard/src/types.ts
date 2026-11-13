@@ -77,3 +77,18 @@ export interface TopDish {
   restaurant?: string;
   quantity: number;
 }
+export type RestaurantStatus = "PENDING" | "ACTIVE" | "SUSPENDED";
+
+export interface AdminRestaurant {
+  id: number;
+  name: string;
+  logo: string | null;
+  address: string;
+  latitude: number;
+  longitude: number;
+  cuisine: string;
+  openingHours: string | null;
+  status: RestaurantStatus;
+  commissionRate: number;
+  owner: { id: number; name: string; email: string };
+}

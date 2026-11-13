@@ -7,9 +7,8 @@ import Login from "./pages/login";
 import Placeholder from "./pages/placeholder";
 import Orders from "./pages/restaurant/orders";
 import Menu from "./pages/restaurant/menu";
-import stats from "./pages/restaurant/stats";
 import Stats from "./pages/restaurant/stats";
-
+import Restaurants from "./pages/admin/Restaurants";
 export default function App() {
   const { user } = useAuth();
 
@@ -28,7 +27,7 @@ export default function App() {
       <Route element={<ProtectedRoute roles={["SUPER_ADMIN"]} />}>
         <Route element={<DashboardLayout />}>
           <Route path="/admin/overview" element={<Placeholder title="Overview" />} />
-          <Route path="/admin/restaurants" element={<Placeholder title="Restaurants" />} />
+          <Route path="/admin/restaurants" element={<Restaurants />} />
           <Route path="/admin/drivers" element={<Placeholder title="Drivers" />} />
           <Route path="/admin/clients" element={<Placeholder title="Clients" />} />
           <Route path="/admin/orders" element={<Placeholder title="All orders" />} />
