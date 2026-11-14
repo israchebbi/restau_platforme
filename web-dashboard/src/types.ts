@@ -115,3 +115,42 @@ export interface ClientRow {
   createdAt: string;
   _count: { orders: number };
 }
+
+export interface AdminOrder {
+  id: number;
+  status: OrderStatus;
+  paymentMode: PaymentMode;
+  total: number;
+  deliveryFee: number;
+  address: string;
+  createdAt: string;
+  restaurant: { id: number; name: string };
+  client: { id: number; name: string };
+  driver: { user: { name: string } } | null;
+  payment: { status: "PENDING" | "PAID" | "FAILED"; commission: number } | null;
+}
+
+export interface OrdersPage {
+  data: AdminOrder[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface AdminOverview extends StatsOverview {
+  activeRestaurants: number;
+  pendingRestaurants: number;
+  drivers: number;
+  availableDrivers: number;
+  clients: number;
+}
+
+export interface RestaurantStat {
+  restaurantId: number;
+  name: string;
+  status: RestaurantStatus;
+  deliveredOrders: number;
+  sales: number;
+  commission: number;
+  net: number;
+}
