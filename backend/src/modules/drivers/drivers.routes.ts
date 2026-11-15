@@ -15,5 +15,6 @@ router.patch("/me/location", authorize("DRIVER"), controller.updateLocation);
 router.get("/", authorize("SUPER_ADMIN"), controller.list);
 router.post("/", authorize("SUPER_ADMIN"), controller.create);
 router.delete("/:id", authorize("SUPER_ADMIN"), controller.remove);
+router.patch("/:id/status", authorize("SUPER_ADMIN"), controller.changeStatus);
 
 export default router;

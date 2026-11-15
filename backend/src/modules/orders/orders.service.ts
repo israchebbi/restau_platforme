@@ -170,7 +170,11 @@ export async function updateRestaurantStatus(
   return updated;}
 
 // ---------- Driver ----------
-export function listAvailableOrders() {
+export async function listAvailableOrders(userId: number) {
+  const driver = await getDriverByUser(userId);
+    if (driver.status !== "APPROVED") {
+      throw new HttpError(403, "Your account is waiting for approval");
+  }
   return prisma.order.findMany({
     where: { status: "READY", driverId: null },
     select: {
@@ -189,6 +193,9 @@ export function listAvailableOrders() {
 
 export async function acceptOrder(userId: number, orderId: number) {
   const driver = await getDriverByUser(userId);
+  if (driver.status !== "APPROVED") {
+    throw new HttpError(403, "Your account is waiting for approval");
+  }
   if (!driver.available) {
     throw new HttpError(400, "Set yourself as available first");
   }

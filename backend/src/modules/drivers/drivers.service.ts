@@ -33,7 +33,11 @@ export async function createDriver(data: {
 
 export function listDrivers() {
   return prisma.driver.findMany({
-    include: { user: { select: { id: true, name: true, email: true, phone: true } } },
+    include: {
+      user: {
+        select: { id: true, name: true, email: true, phone: true, isBlocked: true },
+      },
+    },
   });
 }
 
@@ -73,5 +77,17 @@ export async function setLocation(
   return prisma.driver.update({
     where: { id: driver.id },
     data: { latitude, longitude },
+  });
+}
+
+export async function setDriverStatus(
+  id: number,
+  status: "APPROVED" | "REJECTED"
+) {
+  const driver = await prisma.driver.findUnique({ where: { id } });
+  if (!driver) throw new HttpError(404, "Driver not found");
+  return prisma.driver.update({
+    where: { id },
+    data: { status, ...(status === "REJECTED" ? { available: false } : {}) },
   });
 }

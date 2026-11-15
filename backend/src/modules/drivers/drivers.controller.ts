@@ -3,6 +3,7 @@ import * as service from "./drivers.service";
 import {
   availabilitySchema,
   createDriverSchema,
+  driverStatusSchema,
   locationSchema,
 } from "./drivers.schema";
 
@@ -53,6 +54,15 @@ export const updateLocation: RequestHandler = async (req, res, next) => {
   try {
     const { latitude, longitude } = locationSchema.parse(req.body);
     res.json(await service.setLocation(req.user!.id, latitude, longitude));
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const changeStatus: RequestHandler = async (req, res, next) => {
+  try {
+    const { status } = driverStatusSchema.parse(req.body);
+    res.json(await service.setDriverStatus(Number(req.params.id), status));
   } catch (err) {
     next(err);
   }

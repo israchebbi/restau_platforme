@@ -9,6 +9,7 @@ import driverRoutes from "./modules/drivers/drivers.routes";
 import orderRoutes from "./modules/orders/orders.routes";
 import statsRoutes from "./modules/stats/stats.routes";
 import adminRoutes from "./modules/admin/admin.routes";
+import onboardingRoutes from "./modules/onboarding/onboarding.routes";
 
 const app = express();
 
@@ -31,7 +32,7 @@ app.use("/api/drivers" , driverRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/stats", statsRoutes);
 app.use("/api/admin", adminRoutes);
-
+app.use("/api/onboarding", onboardingRoutes);
 app.use(errorHandler);
 
 export default app;

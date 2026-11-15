@@ -51,8 +51,9 @@ export const changeStatus = handle((req) =>
 );
 
 // Driver
-export const listAvailable = handle(() => service.listAvailableOrders());
-export const accept = handle((req) =>
+export const listAvailable = handle((req) =>
+  service.listAvailableOrders(req.user!.id)
+);export const accept = handle((req) =>
   service.acceptOrder(req.user!.id, idParam(req))
 );
 export const changeDeliveryStatus = handle((req) =>
