@@ -97,6 +97,7 @@ export interface DriverRow {
   userId: number;
   available: boolean;
   vehicle: string | null;
+  status: "PENDING" | "APPROVED" | "REJECTED";
   user: {
     id: number;
     name: string;
@@ -153,4 +154,8 @@ export interface RestaurantStat {
   sales: number;
   commission: number;
   net: number;
+}
+export interface MyRestaurant {
+  name: string;
+  status: RestaurantStatus;
 }

@@ -5,6 +5,16 @@ import DriverForm from "../../components/DriverForm";
 import type { DriverFormValues } from "../../components/DriverForm";
 import type { DriverRow } from "../../types";
 
+function accountBadge(driver: DriverRow) {
+  if (driver.status === "PENDING")
+    return { label: "Pending approval", className: "bg-amber-50 text-amber-700" };
+  if (driver.status === "REJECTED")
+    return { label: "Rejected", className: "bg-slate-100 text-slate-500" };
+  if (driver.user.isBlocked)
+    return { label: "Blocked", className: "bg-red-50 text-red-700" };
+  return { label: "Active", className: "bg-green-50 text-green-700" };
+}
+
 export default function Drivers() {
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
@@ -46,6 +56,21 @@ export default function Drivers() {
   const blockDriver = useMutation({
     mutationFn: ({ userId, blocked }: { userId: number; blocked: boolean }) =>
       api.patch(`/api/admin/users/${userId}/block`, { blocked }),
+    onSuccess: () => {
+      setError("");
+      refresh();
+    },
+    onError,
+  });
+
+  const reviewDriver = useMutation({
+    mutationFn: ({
+      id,
+      status,
+    }: {
+      id: number;
+      status: "APPROVED" | "REJECTED";
+    }) => api.patch(`/api/drivers/${id}/status`, { status }),
     onSuccess: () => {
       setError("");
       refresh();
@@ -105,69 +130,101 @@ export default function Drivers() {
               </tr>
             )}
 
-            {drivers.map((driver) => (
-              <tr key={driver.id}>
-                <td className="px-4 py-3">
-                  <div className="font-medium text-slate-800">
-                    {driver.user.name}
-                  </div>
-                  <div className="text-xs text-slate-500">
-                    {driver.user.email}
-                  </div>
-                </td>
-                <td className="px-4 py-3 text-slate-700">{driver.user.phone}</td>
-                <td className="px-4 py-3 text-slate-700">
-                  {driver.vehicle ?? "—"}
-                </td>
-                <td className="px-4 py-3">
-                  <span
-                    className={`text-xs px-2 py-0.5 rounded-full ${
-                      driver.available
-                        ? "bg-green-50 text-green-700"
-                        : "bg-slate-100 text-slate-500"
-                    }`}
-                  >
-                    {driver.available ? "Available" : "Offline"}
-                  </span>
-                </td>
-                <td className="px-4 py-3">
-                  <span
-                    className={`text-xs px-2 py-0.5 rounded-full ${
-                      driver.user.isBlocked
-                        ? "bg-red-50 text-red-700"
-                        : "bg-slate-100 text-slate-600"
-                    }`}
-                  >
-                    {driver.user.isBlocked ? "Blocked" : "Active"}
-                  </span>
-                </td>
-                <td className="px-4 py-3 text-right whitespace-nowrap">
-                  <button
-                    disabled={blockDriver.isPending}
-                    onClick={() =>
-                      blockDriver.mutate({
-                        userId: driver.userId,
-                        blocked: !driver.user.isBlocked,
-                      })
-                    }
-                    className="text-slate-600 hover:underline mr-4 disabled:opacity-50"
-                  >
-                    {driver.user.isBlocked ? "Unblock" : "Block"}
-                  </button>
-                  <button
-                    disabled={removeDriver.isPending}
-                    onClick={() => {
-                      if (window.confirm(`Delete "${driver.user.name}"?`)) {
-                        removeDriver.mutate(driver.id);
-                      }
-                    }}
-                    className="text-red-600 hover:underline disabled:opacity-50"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {drivers.map((driver) => {
+              const badge = accountBadge(driver);
+              return (
+                <tr key={driver.id}>
+                  <td className="px-4 py-3">
+                    <div className="font-medium text-slate-800">
+                      {driver.user.name}
+                    </div>
+                    <div className="text-xs text-slate-500">
+                      {driver.user.email}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-slate-700">
+                    {driver.user.phone}
+                  </td>
+                  <td className="px-4 py-3 text-slate-700">
+                    {driver.vehicle ?? "—"}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={`text-xs px-2 py-0.5 rounded-full ${
+                        driver.available
+                          ? "bg-green-50 text-green-700"
+                          : "bg-slate-100 text-slate-500"
+                      }`}
+                    >
+                      {driver.available ? "Available" : "Offline"}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={`text-xs px-2 py-0.5 rounded-full ${badge.className}`}
+                    >
+                      {badge.label}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-right whitespace-nowrap">
+                    {driver.status === "APPROVED" ? (
+                      <button
+                        disabled={blockDriver.isPending}
+                        onClick={() =>
+                          blockDriver.mutate({
+                            userId: driver.userId,
+                            blocked: !driver.user.isBlocked,
+                          })
+                        }
+                        className="text-slate-600 hover:underline mr-4 disabled:opacity-50"
+                      >
+                        {driver.user.isBlocked ? "Unblock" : "Block"}
+                      </button>
+                    ) : (
+                      <>
+                        <button
+                          disabled={reviewDriver.isPending}
+                          onClick={() =>
+                            reviewDriver.mutate({
+                              id: driver.id,
+                              status: "APPROVED",
+                            })
+                          }
+                          className="text-green-700 hover:underline mr-4 disabled:opacity-50"
+                        >
+                          Approve
+                        </button>
+                        {driver.status === "PENDING" && (
+                          <button
+                            disabled={reviewDriver.isPending}
+                            onClick={() =>
+                              reviewDriver.mutate({
+                                id: driver.id,
+                                status: "REJECTED",
+                              })
+                            }
+                            className="text-slate-600 hover:underline mr-4 disabled:opacity-50"
+                          >
+                            Reject
+                          </button>
+                        )}
+                      </>
+                    )}
+                    <button
+                      disabled={removeDriver.isPending}
+                      onClick={() => {
+                        if (window.confirm(`Delete "${driver.user.name}"?`)) {
+                          removeDriver.mutate(driver.id);
+                        }
+                      }}
+                      className="text-red-600 hover:underline disabled:opacity-50"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

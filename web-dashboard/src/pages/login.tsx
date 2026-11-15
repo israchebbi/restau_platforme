@@ -1,10 +1,9 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/auth-context";
 import { homeFor } from "../auth/home";
 import { getErrorMessage } from "../lib/api";
-
 export default function Login() {
   const { user, login } = useAuth();
   const navigate = useNavigate();
@@ -81,6 +80,12 @@ export default function Login() {
         >
           {loading ? "Signing in…" : "Sign in"}
         </button>
+        <p className="text-center text-sm text-slate-500">
+            Want to join the platform?{" "}
+            <Link to="/join" className="text-orange-600 hover:underline">
+                  Become a partner
+            </Link>
+        </p>
       </form>
     </div>
   );

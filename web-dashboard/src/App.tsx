@@ -2,16 +2,20 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { useAuth } from "./auth/auth-context";
 import { homeFor } from "./auth/home";
 import ProtectedRoute from "./auth/protectionRoute";
+import RestaurantGate from "./auth/RestaurantGate";
 import DashboardLayout from "./layouts/dashboardLayout";
 import Login from "./pages/login";
-import Placeholder from "./pages/placeholder";
+import Join from "./pages/join/Join";
+import JoinRestaurant from "./pages/join/JoinRestaurant";
+import JoinDriver from "./pages/join/JoinDriver";
+import JoinDone from "./pages/join/JoinDone";
 import Orders from "./pages/restaurant/orders";
 import Menu from "./pages/restaurant/menu";
 import Stats from "./pages/restaurant/stats";
-import Restaurants from "./pages/admin/Restaurants";
-import Clients from "./pages/admin/Clients";
-import Drivers from "./pages/admin/Drivers";
 import Overview from "./pages/admin/Overview";
+import Restaurants from "./pages/admin/Restaurants";
+import Drivers from "./pages/admin/Drivers";
+import Clients from "./pages/admin/Clients";
 import AllOrders from "./pages/admin/AllOrders";
 
 export default function App() {
@@ -21,11 +25,18 @@ export default function App() {
     <Routes>
       <Route path="/login" element={<Login />} />
 
+      <Route path="/join" element={<Join />} />
+      <Route path="/join/restaurant" element={<JoinRestaurant />} />
+      <Route path="/join/driver" element={<JoinDriver />} />
+      <Route path="/join/done/:type" element={<JoinDone />} />
+
       <Route element={<ProtectedRoute roles={["RESTAURANT"]} />}>
-        <Route element={<DashboardLayout />}>
-          <Route path="/restaurant/orders" element={<Orders />} />
-          <Route path="/restaurant/menu" element={<Menu />} />
-          <Route path="/restaurant/stats" element={<Stats />} />
+        <Route element={<RestaurantGate />}>
+          <Route element={<DashboardLayout />}>
+            <Route path="/restaurant/orders" element={<Orders />} />
+            <Route path="/restaurant/menu" element={<Menu />} />
+            <Route path="/restaurant/stats" element={<Stats />} />
+          </Route>
         </Route>
       </Route>
 
