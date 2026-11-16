@@ -4,9 +4,12 @@ import jwt from "jsonwebtoken";
 import { Role } from "@prisma/client";
 import { prisma } from "../config/prisma";
 import { setIO } from "./io";
+import { allowedOrigins } from "../config/cors";
 
 export function initSocket(httpServer: HttpServer) {
-  const io = new Server(httpServer, { cors: { origin: "*" } });
+    const io = new Server(httpServer, {
+    cors: { origin: allowedOrigins?.length ? allowedOrigins : "*" },
+  });
 
   // Only authenticated users can connect
   io.use((socket, next) => {

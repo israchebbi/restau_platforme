@@ -3,9 +3,11 @@ import bcrypt from "bcryptjs";
 import { prisma } from "../config/prisma";
 
 async function main() {
-  const email = "admin@platform.com";
-  const passwordHash = await bcrypt.hash("Admin123!", 10);
-
+    const email = process.env.ADMIN_EMAIL ?? "admin@platform.com";
+    const passwordHash = await bcrypt.hash(
+       process.env.ADMIN_PASSWORD ?? "Admin123!",
+       10);
+       
   await prisma.user.upsert({
     where: { email },
     update: {},

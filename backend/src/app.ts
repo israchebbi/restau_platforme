@@ -10,11 +10,14 @@ import orderRoutes from "./modules/orders/orders.routes";
 import statsRoutes from "./modules/stats/stats.routes";
 import adminRoutes from "./modules/admin/admin.routes";
 import onboardingRoutes from "./modules/onboarding/onboarding.routes";
+import uploadRoutes from "./modules/uploads/uploads.routes";
+import{ allowedOrigins } from "./config/cors";
 
 const app = express();
 
 app.use(helmet());
-app.use(cors());
+app.set("trust proxy", 1); // the app runs behind a proxy in production
+app.use(cors({ origin: allowedOrigins?.length ? allowedOrigins : true }));
 app.use(express.json());
 
 app.get("/", (_req, res) => {
@@ -33,6 +36,7 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/stats", statsRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/onboarding", onboardingRoutes);
+app.use("/api/uploads", uploadRoutes);
 app.use(errorHandler);
 
 export default app;
