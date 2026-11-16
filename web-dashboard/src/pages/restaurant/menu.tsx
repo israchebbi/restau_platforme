@@ -5,6 +5,7 @@ import { api, getErrorMessage } from "../../lib/api";
 import DishForm from "../../components/dishform";
 import type { DishFormValues } from "../../components/dishform";
 import type { Category, Dish } from "../../types";
+import Skeleton from "../../components/Skeleton";
 
 export default function Menu() {
   const queryClient = useQueryClient();
@@ -146,7 +147,13 @@ export default function Menu() {
         />
       )}
 
-      {isLoading && <p className="text-slate-500">Loading menu…</p>}
+      {isLoading && (
+        <div className="space-y-4">
+          <Skeleton className="h-32" />
+          <Skeleton className="h-32" />
+        </div>
+      )}
+      
       {loadError && (
         <p className="text-red-600 text-sm">{getErrorMessage(loadError)}</p>
       )}

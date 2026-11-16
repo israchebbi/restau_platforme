@@ -12,6 +12,7 @@ import JoinDone from "./pages/join/JoinDone";
 import Orders from "./pages/restaurant/orders";
 import Menu from "./pages/restaurant/menu";
 import Stats from "./pages/restaurant/stats";
+import Profile from "./pages/restaurant/Profile";
 import Overview from "./pages/admin/Overview";
 import Restaurants from "./pages/admin/Restaurants";
 import Drivers from "./pages/admin/Drivers";
@@ -36,6 +37,7 @@ export default function App() {
             <Route path="/restaurant/orders" element={<Orders />} />
             <Route path="/restaurant/menu" element={<Menu />} />
             <Route path="/restaurant/stats" element={<Stats />} />
+            <Route path="/restaurant/profile" element={<Profile />} />
           </Route>
         </Route>
       </Route>

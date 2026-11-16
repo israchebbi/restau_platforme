@@ -1,7 +1,14 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Volume2, VolumeX } from "lucide-react";
 import { api, getErrorMessage } from "../../lib/api";
 import { useOrderEvents } from "../../hooks/userOrderEvents";
+import Skeleton from "../../components/Skeleton";
+import {
+  playNotification,
+  readSoundPreference,
+  saveSoundPreference,
+} from "../../lib/sound";
 import type { Order, OrderStatus } from "../../types";
 
 interface Action {
@@ -109,11 +116,20 @@ function OrderCard({
 export default function Orders() {
   const queryClient = useQueryClient();
   const [notice, setNotice] = useState("");
+  const [soundOn, setSoundOn] = useState(readSoundPreference);
 
   const connected = useOrderEvents(() => {
     setNotice("New order received");
     setTimeout(() => setNotice(""), 4000);
+    if (soundOn) playNotification();
   });
+
+  function toggleSound() {
+    const next = !soundOn;
+    setSoundOn(next);
+    saveSoundPreference(next);
+    if (next) playNotification(); // a test beep, which also unlocks audio
+  }
 
   const { data: orders = [], isLoading, error } = useQuery({
     queryKey: ["restaurant-orders"],
@@ -132,15 +148,30 @@ export default function Orders() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-slate-800">Live orders</h1>
-        <span
-          className={`text-xs px-3 py-1 rounded-full ${
-            connected
-              ? "bg-green-50 text-green-700"
-              : "bg-slate-200 text-slate-600"
-          }`}
-        >
-          {connected ? "Live" : "Offline"}
-        </span>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={toggleSound}
+            aria-pressed={soundOn}
+            aria-label={soundOn ? "Turn the sound off" : "Turn the sound on"}
+            className="rounded-full border border-slate-300 bg-white p-2 text-slate-600 hover:bg-slate-50"
+          >
+            {soundOn ? (
+              <Volume2 className="h-4 w-4" />
+            ) : (
+              <VolumeX className="h-4 w-4" />
+            )}
+          </button>
+          <span
+            className={`text-xs px-3 py-1 rounded-full ${
+              connected
+                ? "bg-green-50 text-green-700"
+                : "bg-slate-200 text-slate-600"
+            }`}
+          >
+            {connected ? "Live" : "Offline"}
+          </span>
+        </div>
       </div>
 
       {notice && (
@@ -155,40 +186,48 @@ export default function Orders() {
         </div>
       )}
 
-      {isLoading && <p className="text-slate-500">Loading orders…</p>}
+      {isLoading && (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-32" />
+          ))}
+        </div>
+      )}
       {error && (
         <p className="text-red-600 text-sm">{getErrorMessage(error)}</p>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 items-start">
-        {COLUMNS.map((column) => {
-          const columnOrders = orders.filter((o) =>
-            column.statuses.includes(o.status)
-          );
-          return (
-            <div key={column.title} className="space-y-3">
-              <h2 className="text-sm font-medium text-slate-600">
-                {column.title} ({columnOrders.length})
-              </h2>
-              {columnOrders.length === 0 && (
-                <div className="text-xs text-slate-400 border border-dashed border-slate-300 rounded-lg p-4 text-center">
-                  No orders
-                </div>
-              )}
-              {columnOrders.map((order) => (
-                <OrderCard
-                  key={order.id}
-                  order={order}
-                  busy={changeStatus.isPending}
-                  onAction={(status) =>
-                    changeStatus.mutate({ id: order.id, status })
-                  }
-                />
-              ))}
-            </div>
-          );
-        })}
-      </div>
+      {!isLoading && (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 items-start">
+          {COLUMNS.map((column) => {
+            const columnOrders = orders.filter((o) =>
+              column.statuses.includes(o.status)
+            );
+            return (
+              <div key={column.title} className="space-y-3">
+                <h2 className="text-sm font-medium text-slate-600">
+                  {column.title} ({columnOrders.length})
+                </h2>
+                {columnOrders.length === 0 && (
+                  <div className="text-xs text-slate-400 border border-dashed border-slate-300 rounded-lg p-4 text-center">
+                    No orders
+                  </div>
+                )}
+                {columnOrders.map((order) => (
+                  <OrderCard
+                    key={order.id}
+                    order={order}
+                    busy={changeStatus.isPending}
+                    onAction={(status) =>
+                      changeStatus.mutate({ id: order.id, status })
+                    }
+                  />
+                ))}
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

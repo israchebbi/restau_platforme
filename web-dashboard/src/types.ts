@@ -156,6 +156,14 @@ export interface RestaurantStat {
   net: number;
 }
 export interface MyRestaurant {
+  id: number;
   name: string;
+  logo: string | null;
+  address: string;
+  latitude: number;
+  longitude: number;
+  cuisine: string;
+  openingHours: string | null;
   status: RestaurantStatus;
+  isOpen: boolean;
 }

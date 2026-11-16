@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import type { Category, Dish } from "../types";
+import ImageUpload from "./ImageUpload";
 
 export interface DishFormValues {
   name: string;
@@ -125,18 +126,14 @@ export default function DishForm({
           </select>
         </div>
 
-        <div className="space-y-1">
-          <label htmlFor="dish-image" className="text-sm text-slate-700">
-            Image URL (optional)
-          </label>
-          <input
-            id="dish-image"
-            value={image}
-            onChange={(e) => setImage(e.target.value)}
-            placeholder="https://..."
-            className={inputClass}
-          />
-        </div>
+             <div className="md:col-span-2">
+                <ImageUpload
+                  label="Photo (optional)"
+                  type="dish"
+                  value={image}
+                  onChange={setImage}
+                />
+              </div>
       </div>
 
       <div className="space-y-1">
