@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "./index.css";
 import App from "./App";
 import { AuthProvider } from "./auth/authProvider";
+import "@fontsource-variable/plus-jakarta-sans";
 
 const queryClient = new QueryClient();
 

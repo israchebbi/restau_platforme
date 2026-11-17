@@ -18,6 +18,8 @@ import Restaurants from "./pages/admin/Restaurants";
 import Drivers from "./pages/admin/Drivers";
 import Clients from "./pages/admin/Clients";
 import AllOrders from "./pages/admin/AllOrders";
+import Home from "./pages/Home";
+
 
 export default function App() {
   const { user } = useAuth();
@@ -30,6 +32,8 @@ export default function App() {
       <Route path="/join/restaurant" element={<JoinRestaurant />} />
       <Route path="/join/driver" element={<JoinDriver />} />
       <Route path="/join/done/:type" element={<JoinDone />} />
+      <Route path="/" element={<Home />} />
+      <Route path="/login" element={<Login />} />
 
       <Route element={<ProtectedRoute roles={["RESTAURANT"]} />}>
         <Route element={<RestaurantGate />}>

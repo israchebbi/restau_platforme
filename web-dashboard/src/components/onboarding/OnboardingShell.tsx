@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { Clock, MapPin, TrendingUp, Wallet } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { BRAND } from "../../config/brand";
 
 type Kind = "restaurant" | "driver";
 
@@ -48,7 +49,7 @@ export default function OnboardingShell({
         <div className="absolute -bottom-32 -left-20 h-96 w-96 rounded-full bg-white/10" />
 
         <Link to="/join" className="relative text-lg font-semibold">
-          Restaurant Platform
+          {BRAND.name}
         </Link>
 
         <div className="relative space-y-8">

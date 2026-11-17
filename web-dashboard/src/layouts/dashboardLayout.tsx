@@ -2,6 +2,7 @@ import { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import { Menu as MenuIcon, X } from "lucide-react";
 import { useAuth } from "../auth/auth-context";
+import { BRAND } from "../config/brand";
 
 const restaurantLinks = [
   { to: "/restaurant/orders", label: "Orders" },
@@ -40,7 +41,7 @@ export default function DashboardLayout() {
         <div className="p-5 border-b border-slate-200 flex items-start justify-between">
           <div>
             <div className="text-lg font-semibold text-orange-600">
-              Restaurant Platform
+              {BRAND.name}
             </div>
             <div className="text-xs text-slate-500">
               {user?.role === "SUPER_ADMIN" ? "Administration" : "Restaurant"}
@@ -98,7 +99,7 @@ export default function DashboardLayout() {
             <MenuIcon className="h-6 w-6" />
           </button>
           <span className="font-semibold text-orange-600">
-            Restaurant Platform
+            {BRAND.name}
           </span>
         </header>
 
